@@ -49,23 +49,40 @@ HELP="""  ---------------------------------------- HELP MENU -------------------
 
 def feed():
 	L=[]
-	f1=open(r'words.txt','r')
-
+	f1=open('words.txt','r')
 	for line in f1:
 		if (line !='\n') and (' - ' in line):
 			L.append(line.split(' - '))
 	f1.close()
 	return(L)
 
+def load_ehw():
+	L=[]
+	f1=open('ehw.txt','r+')
+	for line in f1:
+		if (line !='\n'):
+			L.append(line)
+	f1.close()
+	return(L)
 
-def hw_feed(F):        
+def load_rhw():
+	L=[]
+	f1=open('rhw.txt','r+')
+	for line in f1:
+		if (line !='\n'):
+			L.append(line)
+	f1.close()
+	return(L)
+
+
+def hw_feed(F):
 	if F=='ehw':
 		LL=[]
 		for line in EHW:
 			if (line !='\n') and (' - ' in line):
 				LL.append(line.split(' - '))
 		return LL
-	  			
+
 	if F=='rhw':
 		LL=[]
 		for line in RHW:
@@ -104,7 +121,7 @@ def random_lang(flag='e',L=[]):
 		text='RANDOM RUSSIAN WORDS MODE'
 	if flag == 'r1':
 		text='RANDOM RUSSIAN WORDS FROM HARD WORDS LIST MODE'
-		otstup=41	  
+		otstup=41
 	while True:
 		K=L[random.randint(0,len(L)-1)]
 		print(' '*otstup+'<--------|'+text+' |-------->\n')
@@ -144,7 +161,7 @@ def sequential_lang(flag='e',L=[]):
 		text='RUSSIAN WORDS BY SEQUENCE'
 	if flag == 'r1':
 		otstup=38
-		text='RUSSIAN WORDS BY SEQUENCE FROM HARD WORDS LIST'	  	
+		text='RUSSIAN WORDS BY SEQUENCE FROM HARD WORDS LIST'
 	for tt in L:
 		print(' '*49+'<---| '+text+' -> ',t0+1, ' of ',len(L),' |--->\n')
 		t0+=1
@@ -169,65 +186,67 @@ def sequential_lang(flag='e',L=[]):
 		if t0 == len(L):
 			print('\nALL WORDS ARE FETCHED!\n')
 		continue
-	
-	 
-def mscript(kom):	  
+
+
+def mscript(kom):
 	if (kom == 're') and (not WORDLIST):
 		print('Global Word List is empty')
 	elif kom == 're':
 		print('English words will appear in random order from Global English Words List\n')
 		random_lang('e',WORDLIST)
-	  
+
 	if (kom == 'rr') and (not WORDLIST):
 		print('Global Word List is empty')
 	elif kom == 'rr':
 		print('Russian words will appear in random order from Global Russian Words List\n')
 		random_lang('r',WORDLIST)
-	  
-	  
+
+
 	if kom == 'se' and not WORDLIST:
 		print('Global Word List is empty')
 	elif kom == 'se':
 		print('English words will appear sequentially from the Global English Words base.\n')
 		sequential_lang('e',WORDLIST)
-	  
-	  
+
+
 	if kom == 'sr' and not WORDLIST:
 		print('Global Word List is empty')
 	elif kom == 'sr':
 		print('English words will appear sequentially from the Global Russian Words base.\n')
 		sequential_lang('r',WORDLIST)
-	  
-	
+
+
 	if kom == 'rehw' and not EHW:
-		print('Currently there is no word(s) added to English Hard Words list\n')		
+		print('Currently there is no word(s) added to English Hard Words list\n')
 	elif kom == 'rehw':
-		print('English words will appear in random order from the English Hard Words List.\n')		
+		print('English words will appear in random order from the English Hard Words List.\n')
 		L=hw_feed(F='ehw')
 		random_lang('e1',L)
-	  
+
 	if kom == 'rrhw' and not RHW:
 		print('Currently there is no word(s) added to Russian Hard Words list\n')
 	elif kom == 'rrhw':
-		print('Russian words will appear in random order from the Russian Hard Words List.\n')	
+		print('Russian words will appear in random order from the Russian Hard Words List.\n')
 		L=hw_feed(F='rhw')
 		random_lang('r1',L)
 
 	if kom == 'sehw' and not EHW:
-		print('Currently there is no word(s) added to English Hard Words list\n')		
+		print('Currently there is no word(s) added to English Hard Words list\n')
 	elif kom == 'sehw':
-		print('English words will appear sequentially from the English Hard Words List.\n')		
+		print('English words will appear sequentially from the English Hard Words List.\n')
 		L=hw_feed(F='ehw')
 		sequential_lang('e1',L)
-	
+
 	if kom == 'srhw' and not RHW:
 		print('Currently there is no word(s) added to Russian Hard Words list\n')
 	elif kom == 'srhw':
-		print('Russian words will appear sequentially from the Russian Hard Words List.\n')		
+		print('Russian words will appear sequentially from the Russian Hard Words List.\n')
 		L=hw_feed(F='rhw')
 		sequential_lang('r1',L)
-	
+
 WORDLIST=feed()
+EHW = load_ehw()
+RHW = load_rhw()
 
 
 print('#'*150+'\n'+'\n  Welcome to "Word-Practice-Script"! Currently, there are ',len(WORDLIST),' words in our base.\n  Please enter "h" or "help" (without quotes) to list supported commands\' list\n\n'+'#'*150)
@@ -236,13 +255,21 @@ print('#'*150+'\n'+'\n  Welcome to "Word-Practice-Script"! Currently, there are 
 ###########################################################################################################
 
 while com !='quit':
-        
+
 	com=input('Enter command: ')
 	print('\n')
-	
+
 	if com == 'quit':
+		f1 = open('ehw.txt', 'w')
+		for line in EHW:
+			f1.write(line)
+		f1.close()
+		f1 = open('rhw.txt', 'w')
+		for line in RHW:
+			f1.write(line)
+		f1.close()
 		break
-	
+
 	if (com =='r') or (com == 'R'):
 		L2=WORDLIST
 		WORDLIST=[]
@@ -251,7 +278,7 @@ while com !='quit':
 			print('\nNo changes made to words base!\n')
 		else:
 			print('\nWords Base Refreshed! Now there are ',len(WORDLIST),' words to practice.\n')
-		
+
 	if (com == 's') or (com == 'S'):
 		print('\nCurrently there are ',len(WORDLIST),' words for practising.\n')
 		continue
@@ -280,25 +307,11 @@ while com !='quit':
 		else:
 			for line in RHW:
 				print(line)
-		
+
 	if com in VALID_CMD:
 		mscript(com)
-	  			
+
 	else:
 		continue
 
 #########################################################################################
-
-	  
-	  
-
-
-
-
-
-
-
-
-
-
-
