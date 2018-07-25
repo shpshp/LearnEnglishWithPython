@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import random, sys, codecs
 
 WORDLIST = []
@@ -55,10 +56,8 @@ def umlaut_handler(e):
 	else:
 		replacement = u'?'
 	return replacement, e.start + len(part)
-	#return replacement, e.end
 
 def print_console(line):
-	#print(str(codecs.encode(line, sys.stdout.encoding, 'replace'), sys.stdout.encoding))
 	print(str(codecs.encode(line, sys.stdout.encoding, 'umlaut'), sys.stdout.encoding))
 
 def feed():
@@ -139,7 +138,7 @@ def random_lang(flag = 'e', L = []):
 		otstup = 41
 	while True:
 		K = L[random.randint(0,len(L) - 1)]
-		print_console(' '*otstup + '<--------|' + text + ' |-------->\n')
+		print_console(' '*otstup + '<--------| ' + text + ' |-------->\n')
 		print_console('*'*150 + '\n')
 		boxer(K[x].rstrip())
 		xx = input('')
@@ -258,11 +257,12 @@ def mscript(kom):
 		sequential_lang('r1',L)
 
 codecs.register_error('umlaut', umlaut_handler)
+random.seed()
 
 language = input('Choose language [2 letters: en, de, etc]: ')
 print_console('\n')
 
-WORDLIST=feed()
+WORDLIST = feed()
 EHW = load_ehw()
 RHW = load_rhw()
 
@@ -302,11 +302,11 @@ while com != 'quit':
 		print_console(HELP)
 
 	if com == 'fe':
-		EHW=[]
+		EHW = []
 		print_console('\n !!! ' + language.upper() + ' HARD WORDS LIST HAS BEEN FLUSHED !!!\n')
 
 	if com == 'fr':
-		RHW=[]
+		RHW = []
 		print_console('\n !!! RUSSIAN HARD WORDS LIST HAS BEEN FLUSHED !!!\n')
 
 	if com == 'ehw':
