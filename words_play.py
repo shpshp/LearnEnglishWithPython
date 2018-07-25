@@ -4,6 +4,7 @@ com=''
 EHW=[]
 RHW=[]
 VALID_CMD=['re','rr','se','sr','rehw','rrhw','sehw','srhw']
+language=""
 
 HELP="""  ---------------------------------------- HELP MENU ----------------------------------------
 
@@ -49,7 +50,7 @@ HELP="""  ---------------------------------------- HELP MENU -------------------
 
 def feed():
 	L=[]
-	f1=open('words.txt','r')
+	f1=open('words_' + language + '.txt','r')
 	for line in f1:
 		if (line !='\n') and (' - ' in line):
 			L.append(line.split(' - '))
@@ -58,7 +59,7 @@ def feed():
 
 def load_ehw():
 	L=[]
-	f1=open('ehw.txt','r+')
+	f1=open('ehw_' + language + '.txt','r+')
 	for line in f1:
 		if (line !='\n'):
 			L.append(line)
@@ -67,7 +68,7 @@ def load_ehw():
 
 def load_rhw():
 	L=[]
-	f1=open('rhw.txt','r+')
+	f1=open('rhw_' + language + '.txt','r+')
 	for line in f1:
 		if (line !='\n'):
 			L.append(line)
@@ -244,10 +245,12 @@ def mscript(kom):
 		L=hw_feed(F='rhw')
 		sequential_lang('r1',L)
 
+language = input('Choose language [2 letters: en, de, etc]: ')
+print('\n')
+
 WORDLIST=feed()
 EHW = load_ehw()
 RHW = load_rhw()
-
 
 print('#'*150+'\n'+'\n  Welcome to "Word-Practice-Script"! Currently, there are ',len(WORDLIST),' words in our base.\n  Please enter "h" or "help" (without quotes) to list supported commands\' list\n\n'+'#'*150)
 
@@ -260,11 +263,11 @@ while com !='quit':
 	print('\n')
 
 	if com == 'quit':
-		f1 = open('ehw.txt', 'w')
+		f1 = open('ehw_' + language + '.txt', 'w')
 		for line in EHW:
 			f1.write(line)
 		f1.close()
-		f1 = open('rhw.txt', 'w')
+		f1 = open('rhw_' + language + '.txt', 'w')
 		for line in RHW:
 			f1.write(line)
 		f1.close()
