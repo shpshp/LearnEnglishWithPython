@@ -176,7 +176,7 @@ def sequential_lang(flag = 'e', L = []):
 		otstup = 38
 		text = 'RUSSIAN WORDS BY SEQUENCE FROM HARD WORDS LIST'
 	for tt in L:
-		print_console(' '*49 + '<---| ' + text + ' -> ', t0 + 1, ' of ', len(L), ' |--->\n')
+		print_console(' '*49 + '<---| ' + text + ' -> ' + str(t0 + 1) + ' of ' + str(len(L)) + ' |--->\n')
 		t0 += 1
 		print_console('*'*150 + '\n')
 		boxer(tt[x].rstrip())
@@ -266,7 +266,7 @@ WORDLIST = feed()
 EHW = load_ehw()
 RHW = load_rhw()
 
-print_console('#'*150+'\n'+'\n  Welcome to "Word-Practice-Script"! Currently, there are ' + str(len(WORDLIST)) + ' words in our base.\n  Please enter "h" or "help" (without quotes) to list supported commands\' list\n\n'+'#'*150)
+print_console('#'*150 + '\n\n  Welcome to "Word-Practice-Script"! Currently, there are ' + str(len(WORDLIST)) + ' words in our base.\n  Please enter "h" or "help" (without quotes) to list supported commands\' list\n\n'+'#'*150)
 
 ###########################################################################################################
 
