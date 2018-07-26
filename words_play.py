@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import random, sys, codecs
+import random, sys, codecs, json
 
 WORDLIST = []
 com = ''
@@ -7,6 +7,7 @@ EHW = []
 RHW = []
 VALID_CMD = ['re', 'rr', 'se', 'sr', 'rehw', 'rrhw', 'sehw', 'srhw']
 language = ""
+stateFileName = "state.json"
 
 HELP = """  ---------------------------------------- HELP MENU ----------------------------------------
   h | help - Print that help menu
@@ -87,20 +88,29 @@ def load_hw(prefix):
 
 def load_last_sequential(prefix):
 	result = 0
-	f1 = open(prefix + language + '.txt', 'a')
+	f1 = open(stateFileName, 'a')
 	f1.close()
-	f1 = open(prefix + language + '.txt', 'r', encoding = 'utf8')
-	for line in f1:
-		if (line !='\n'):
-			result = int(line)
-			break
-	f1.close()
+	state = {}
+	with open(stateFileName, 'r', encoding = 'utf8') as f1:
+		try:
+			state = json.load(f1)
+		except:
+			state = {}
+		result = int(state.get(prefix + language, '0'))
 	return(result)
 
 def save_last_sequential(prefix, value):
-	f1 = open(prefix + language + '.txt', 'w', encoding = 'utf8')
-	f1.write(value)
+	f1 = open(stateFileName, 'a')
 	f1.close()
+	state = {}
+	with open(stateFileName, 'r', encoding = 'utf8') as f1:
+		try:
+			state = json.load(f1)
+		except:
+			state = {}
+	state[prefix + language] = value
+	with open(stateFileName, 'w', encoding = 'utf8') as f1:
+		json.dump(state, f1)
 
 def hw_feed(F):
 	if F == 'ehw':
