@@ -18,6 +18,7 @@ HELP = """  ---------------------------------------- HELP MENU -----------------
 
   fe - Flush Language Hard Words List
   fr - Flush Russian Hard Words List
+  f - return to the first word in Sequential word mode
 
   m - Mark word as hard word (Add it to corresponding hard words list (Language or Russian))
 
@@ -53,6 +54,8 @@ def umlaut_handler(e):
 		replacement = u'Oe'
 	elif part == u'ß':
 		replacement = u'ss'
+	elif part == u'é':
+		replacement = u'e'
 	else:
 		replacement = u'?'
 	return replacement, e.start + len(part)
@@ -71,27 +74,33 @@ def feed():
 	f1.close()
 	return(L)
 
-def load_ehw():
+def load_hw(prefix):
 	L = []
-	f1 = open('ehw_' + language + '.txt', 'a')
+	f1 = open(prefix + language + '.txt', 'a')
 	f1.close()
-	f1 = open('ehw_' + language + '.txt', 'r', encoding = 'utf8')
+	f1 = open(prefix + language + '.txt', 'r', encoding = 'utf8')
 	for line in f1:
 		if (line !='\n'):
 			L.append(line)
 	f1.close()
 	return(L)
 
-def load_rhw():
-	L = []
-	f1 = open('rhw_' + language + '.txt', 'a')
+def load_last_sequential(prefix):
+	result = 0
+	f1 = open(prefix + language + '.txt', 'a')
 	f1.close()
-	f1 = open('rhw_' + language + '.txt', 'r', encoding = 'utf8')
+	f1 = open(prefix + language + '.txt', 'r', encoding = 'utf8')
 	for line in f1:
 		if (line !='\n'):
-			L.append(line)
+			result = int(line)
+			break
 	f1.close()
-	return(L)
+	return(result)
+
+def save_last_sequential(prefix, value):
+	f1 = open(prefix + language + '.txt', 'w', encoding = 'utf8')
+	f1.write(value)
+	f1.close()
 
 def hw_feed(F):
 	if F == 'ehw':
@@ -105,11 +114,11 @@ def hw_feed(F):
 		LL = []
 		for line in RHW:
 			if (line !='\n') and (' - ' in line):
-						LL.append(line.split(' - '))
+				LL.append(line.split(' - '))
 	return LL
 
 def boxer(S, i = 0):
-	SL = len(S)
+	SL = len(str(codecs.encode(S, sys.stdout.encoding, 'umlaut'), sys.stdout.encoding))
 	if i == 0:
 		print_console('|' + '-'*(SL+2) + '|\n'+'| ' + S + ' |\n' + '|' + '-'*(SL+2) + '|\n')
 	else:
@@ -148,8 +157,8 @@ def random_lang(flag = 'e', L = []):
 			ehw(K[x], K[y])
 		elif (xx == 'm') and ((flag == 'r') or (flag == 'r1')):
 			rhw(K[y], K[x])
-		boxer(K[y].rstrip(), len(K[x].rstrip()))
 		print_console('*' * 150)
+		boxer(K[y].rstrip(), len(K[x].rstrip()))
 		xxx = input('')
 		if (xxx == 'q') or (xxx == 'quit'):
 			break
@@ -160,7 +169,7 @@ def random_lang(flag = 'e', L = []):
 		continue
 
 def sequential_lang(flag = 'e', L = []):
-	t0 = 0
+	wordOffset = load_last_sequential('pos_' + flag + '_')
 	x = 0
 	y = 1
 	otstup = 49
@@ -175,30 +184,38 @@ def sequential_lang(flag = 'e', L = []):
 	if flag == 'r1':
 		otstup = 38
 		text = 'RUSSIAN WORDS BY SEQUENCE FROM HARD WORDS LIST'
-	for tt in L:
+	t0 = wordOffset
+	while t0 < len(L):
+		tt = L[t0]
 		print_console(' '*49 + '<---| ' + text + ' -> ' + str(t0 + 1) + ' of ' + str(len(L)) + ' |--->\n')
-		t0 += 1
+		save_last_sequential('pos_' + flag + '_', str(t0))
 		print_console('*'*150 + '\n')
 		boxer(tt[x].rstrip())
 		xx = input('')
 		if (xx == 'q') or (xx == 'quit'):
 			break
+		if (xx == 'f'):
+			t0 = 0
+			continue
 		if (xx == 'm') and ((flag == 'e') or (flag == 'e1')):
 			ehw(tt[x], tt[y])
 		elif (xx == 'm') and ((flag == 'r') or (flag == 'r1')):
 			rhw(tt[y], tt[x])
-		boxer(tt[y].rstrip(), len(tt[x].rstrip()))
 		print_console('*' * 150)
+		boxer(tt[y].rstrip(), len(tt[x].rstrip()))
 		xxx = input('')
 		if (xxx == 'q') or (xxx == 'quit'):
 			break
+		if (xxx == 'f'):
+			t0 = 0
+			continue
 		if (xxx == 'm') and ((flag == 'e') or (flag == 'e1')):
 			ehw(tt[x], tt[y])
 		elif (xxx == 'm') and ((flag == 'r') or (flag == 'r1')):
 			rhw(tt[y], tt[x])
+		t0 += 1
 		if t0 == len(L):
 			print_console('\nALL WORDS ARE FETCHED!\n')
-		continue
 
 def mscript(kom):
 	if (kom == 're') and (not WORDLIST):
@@ -263,8 +280,8 @@ language = input('Choose language [2 letters: en, de, etc]: ')
 print_console('\n')
 
 WORDLIST = feed()
-EHW = load_ehw()
-RHW = load_rhw()
+EHW = load_hw('ehw_')
+RHW = load_hw('rhw_')
 
 print_console('#'*150 + '\n\n  Welcome to "Word-Practice-Script"! Currently, there are ' + str(len(WORDLIST)) + ' words in our base.\n  Please enter "h" or "help" (without quotes) to list supported commands\' list\n\n'+'#'*150)
 
