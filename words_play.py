@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import random, sys, codecs, glob
+import random, sys, codecs, json, glob
 
 WORDLIST = []
 com = ''
@@ -7,6 +7,7 @@ EHW = []
 RHW = []
 VALID_CMD = ['re', 'rr', 'se', 'sr', 'rehw', 'rrhw', 'sehw', 'srhw']
 language = ""
+stateFileName = "state.json"
 
 HELP = """  ---------------------------------------- HELP MENU ----------------------------------------
   h | help - Print that help menu
@@ -18,6 +19,7 @@ HELP = """  ---------------------------------------- HELP MENU -----------------
 
   fe - Flush Language Hard Words List
   fr - Flush Russian Hard Words List
+  f - return to the first word in Sequential word mode
 
   m - Mark word as hard word (Add it to corresponding hard words list (Language or Russian))
 
@@ -89,20 +91,29 @@ def load_hw(prefix):
 
 def load_last_sequential(prefix):
 	result = 0
-	f1 = open(prefix + language + '.txt', 'a')
+	f1 = open(stateFileName, 'a')
 	f1.close()
-	f1 = open(prefix + language + '.txt', 'r', encoding = 'utf8')
-	for line in f1:
-		if (line !='\n'):
-			result = int(line)
-			break
-	f1.close()
+	state = {}
+	with open(stateFileName, 'r', encoding = 'utf8') as f1:
+		try:
+			state = json.load(f1)
+		except:
+			state = {}
+		result = int(state.get(prefix + language, '0'))
 	return(result)
 
 def save_last_sequential(prefix, value):
-	f1 = open(prefix + language + '.txt', 'w', encoding = 'utf8')
-	f1.write(value)
+	f1 = open(stateFileName, 'a')
 	f1.close()
+	state = {}
+	with open(stateFileName, 'r', encoding = 'utf8') as f1:
+		try:
+			state = json.load(f1)
+		except:
+			state = {}
+	state[prefix + language] = value
+	with open(stateFileName, 'w', encoding = 'utf8') as f1:
+		json.dump(state, f1)
 
 def hw_feed(F):
 	if F == 'ehw':
@@ -177,8 +188,7 @@ def random_lang(flag = 'e', L = []):
 		continue
 
 def sequential_lang(flag = 'e', L = []):
-	#t0 = 0
-	t0 = load_last_sequential('pos_' + flag + '_')
+	wordOffset = load_last_sequential('pos_' + flag + '_')
 	x = 0
 	y = 1
 	otstup = 49
@@ -193,15 +203,19 @@ def sequential_lang(flag = 'e', L = []):
 	if flag == 'r1':
 		otstup = 38
 		text = 'RUSSIAN WORDS BY SEQUENCE FROM HARD WORDS LIST'
-	for tt in L:
+	t0 = wordOffset
+	while t0 < len(L):
+		tt = L[t0]
 		print_console(' '*49 + '<---| ' + text + ' -> ' + str(t0 + 1) + ' of ' + str(len(L)) + ' |--->\n')
-		t0 += 1
 		save_last_sequential('pos_' + flag + '_', str(t0))
 		print_console('*'*150 + '\n')
 		boxer(tt[x].rstrip())
 		xx = input('')
 		if (xx == 'q') or (xx == 'quit'):
 			break
+		if (xx == 'f'):
+			t0 = 0
+			continue
 		if (xx == 'm') and ((flag == 'e') or (flag == 'e1')):
 			ehw(tt[x], tt[y])
 		elif (xx == 'm') and ((flag == 'r') or (flag == 'r1')):
@@ -211,13 +225,16 @@ def sequential_lang(flag = 'e', L = []):
 		xxx = input('')
 		if (xxx == 'q') or (xxx == 'quit'):
 			break
+		if (xxx == 'f'):
+			t0 = 0
+			continue
 		if (xxx == 'm') and ((flag == 'e') or (flag == 'e1')):
 			ehw(tt[x], tt[y])
 		elif (xxx == 'm') and ((flag == 'r') or (flag == 'r1')):
 			rhw(tt[y], tt[x])
+		t0 += 1
 		if t0 == len(L):
 			print_console('\nALL WORDS ARE FETCHED!\n')
-		continue
 
 def mscript(kom):
 	if (kom == 're') and (not WORDLIST):
