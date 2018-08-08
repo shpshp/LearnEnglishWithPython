@@ -8,6 +8,7 @@ RHW = []
 VALID_CMD = ['re', 'rr', 'se', 'sr', 'rehw', 'rrhw', 'sehw', 'srhw']
 language = ""
 stateFileName = "state.json"
+debug = 0
 
 HELP = """  ---------------------------------------- HELP MENU ----------------------------------------
   h | help - Print that help menu
@@ -55,6 +56,18 @@ def umlaut_handler(e):
 		replacement = u'Oe'
 	elif part == u'ß':
 		replacement = u'ss'
+	elif part == u'üß':
+		replacement = u'uess'
+	elif part == u'Üß':
+		replacement = u'Uess'
+	elif part == u'äß':
+		replacement = u'aess'
+	elif part == u'Äß':
+		replacement = u'Aess'
+	elif part == u'öß':
+		replacement = u'oess'
+	elif part == u'Öß':
+		replacement = u'Oess'
 	elif part == u'é':
 		replacement = u'e'
 	else:
@@ -73,7 +86,7 @@ def feed():
 		if (line !='\n'):
 			if (' - ' in line):
 				L.append(line.split(' - '))
-			else:
+			elif debug != 0:
 				print_console('Skipping the line [' + line +']\n')
 	f1.close()
 	return(L)
@@ -122,7 +135,7 @@ def hw_feed(F):
 			if (line !='\n'):
 				if (' - ' in line):
 					LL.append(line.split(' - '))
-				else:
+				elif debug != 0:
 					print_console('Skipping the line [' + line +']\n')
 		return LL
 
@@ -132,7 +145,7 @@ def hw_feed(F):
 			if (line !='\n'):
 				if (' - ' in line):
 					LL.append(line.split(' - '))
-				else:
+				elif debug != 0:
 					print_console('Skipping the line [' + line +']\n')
 	return LL
 
@@ -295,15 +308,34 @@ def mscript(kom):
 codecs.register_error('umlaut', umlaut_handler)
 random.seed()
 
-print_console('\nSupported languages:\n')
+supportedlangs = []
 for dicfile in glob.glob("words_*.txt"):
-    print(dicfile.replace('words_','').replace('.txt',''))
+	supportedlangs.append(dicfile.replace('words_','').replace('.txt',''))
+print_console('\nSupported languages:\n')
+for lang in supportedlangs:
+	print_console(lang)
 
-language = input('\nChoose language [q - quit]: ')
-print_console('\n')
+language = ''
+while not (language in supportedlangs):
+	language = input('\nChoose language [q - quit, h - help]: ')
+	print_console('\n')
 
-if (language == 'q') or (language == 'quit'):
-    quit()
+	if (language == 'q') or (language == 'quit'):
+		quit()
+
+	if (language == 'h') or (language == 'help'):
+		print_console('\nSupported languages:\n')
+		for lang in supportedlangs:
+			print_console(lang)
+		continue
+
+	if language == 'debug':
+		debug = 1
+		print_console('\nDebug mode is ON\n')
+		continue
+
+	if not (language in supportedlangs):
+		print_console('The language in unsupported')
 
 WORDLIST = feed()
 EHW = load_hw('ehw_')
